@@ -4,6 +4,6 @@ El Programa Nacional de Monitoreo Ecológico (PRONAMEC) se establece mediante de
 
 Para cumplir con su fin de “generar y difundir información científica confiable sobre el estado de la conservación de la biodiversidad del país y sus tendencias, que sea de utilidad para la toma de decisiones a escala local y nacional, en los ámbitos terrestres, aguas continentales y marinos”, el PRONAMEC ha venido elaborando Planes de Monitoreo para algunas áreas silvestres protegidas, y Protocolos de Monitoreo que contienen el detalle técnico sobre los indicadores a ser utilizados y la metodología para recopilar la información necesario. 
 
-En este repositorio, el PRONAMEC pone a disposición información sobre un sistema de Grillas de Monitoreo, que será la base para la implementación de protocolos de monitoreo de mamíferos terrestres y aves terrestres y acuáticas. Este sistema de grillas TODAVÍA NO HA SIDO OFICIALIZADO.
+En este repositorio, el PRONAMEC pone a disposición información sobre un sistema de Grillas de Monitoreo, que será la base para la implementación de protocolos de monitoreo de mamíferos terrestres, y aves terrestres y acuáticas. Este sistema de grillas TODAVÍA NO HA SIDO OFICIALIZADO.
 
-Los detalles técnicos sobre la elaboración del sistema de grillas, se encuentra en el [documento](PRONAMEC_sistema de grillas_v1.pdf)
+
