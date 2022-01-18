@@ -6,4 +6,4 @@ Para cumplir con su fin de “generar y difundir información científica confia
 
 En este repositorio, el PRONAMEC pone a disposición información sobre un sistema de Grillas de Monitoreo, que será la base para la implementación de protocolos de monitoreo de mamíferos terrestres y aves terrestres y acuáticas. Este sistema de grillas TODAVÍA NO HA SIDO OFICIALIZADO.
 
-Los detalles técnicos 
+Los detalles técnicos sobre la elaboración del sistema de grillas, se encuentra en el documento [Sistema de grillas de monitoreo-PRONAMEC](PRONAMEC-Grilla de referencia_Saborío$Spinola_enero22.pdf)
