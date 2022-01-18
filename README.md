@@ -1,13 +1,9 @@
-# Sistema-de-Grillas
-En este repositorio se pone a disposición el sistema de grillas para la aplicación de los protocolos oficiales de monitoreo
+# Sistema de Grillas para el Programa Nacional de Monitoreo Ecológico 
 
-## Creación del sistema de grillas  
+El Programa Nacional de Monitoreo Ecológico (PRONAMEC) se establece mediante decreto Ejecutivo N0 39747-MINAE del 18 de mayo de 2016 (La Gaceta 2016), considerando la Ley Orgánica del Ambiente No 7554, la Ley de Biodiversidad No 7788 y la Ley de Conservación de Vida Silvestre No 7317. 
 
-Se generaron dos sistemas de grillas, uno para el territorio continental e islas/islotes cercanos (continental de acá en adelante) y otro para la Isla del Coco. Ambos sistemas de grillas se crearon usando el programa QGIS 3.16.11 (QGIS.org, 2021), mediante la función Vectorial – Herramientas de Investigación- Crear Cuadrícula, con SRC CRTM05-EPSG 5367 y utilizando valores de Espaciado Horizontal y Espaciado Vertical de 1km x 1 km, 2km x 2km, 4km x 4km, y 8km x 8km. En el caso de la Isla del Coco, solo se generaron grillas de 1x1 km y 2x2 km. 
+Para cumplir con su fin de “generar y difundir información científica confiable sobre el estado de la conservación de la biodiversidad del país y sus tendencias, que sea de utilidad para la toma de decisiones a escala local y nacional, en los ámbitos terrestres, aguas continentales y marinos”, el PRONAMEC ha venido elaborando Planes de Monitoreo para algunas áreas silvestres protegidas, y Protocolos de Monitoreo que contienen el detalle técnico sobre los indicadores a ser utilizados y la metodología para recopilar la información necesario. 
 
-Para la grilla continental se utilizó una extensión de cuadrícula Xmin 280000, Ymin 888000, Xmax 660000, Ymax 1244000 (SINAC 2018) y para la grilla de la Isla del Coco, se utilizó la extensión de la capa Isla del Coco, Xmin 156147.2142, Ymin 164388.5675, Xmax 608238.1248, Ymax 616005.2418.
+En este repositorio, el PRONAMEC pone a disposición información sobre un sistema de Grillas de Monitoreo, que será la base para la implementación de protocolos de monitoreo de mamíferos terrestres y aves terrestres y acuáticas. Este sistema de grillas TODAVÍA NO HA SIDO OFICIALIZADO.
 
-Posteriormente, mediante la función Vectorial – Herramientas de Geoproceso- Cortar, se cortaron las capas generadas con base a la capa “Delimitaciónterritorial2017 1:5mil”, para la grilla continental, y la capa Isla del Coco. 
-
-Por último, todas las capas fueron reproyectadas a CR-SIRGAS-UTM zone 16N
-
+Los detalles técnicos 
