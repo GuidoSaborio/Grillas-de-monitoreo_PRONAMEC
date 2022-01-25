@@ -1,0 +1,251 @@
+---
+title: "APENDICE 1"
+author: "Guido Saborío-R"
+date: "`r format(Sys.time(), '%d/%m/%y')`"
+output: 
+    word_document:
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Paquetes 
+
+Lista de paquetes necesarios.
+
+```{r eval=FALSE }
+library(sf)
+library(rgdal)
+library(magrittr)
+library(dplyr)
+library(tidyverse)
+library(raster)
+  
+```
+
+
+
+## 1. LIMITES TERRESTRES DE COSTA RICA
+
+Para los límites terrestres de Costa Rica, se utilizó la capa "Delimitación territorial 2017 1:5mil" del Instituto Geográfico Nacional disponible en el Sistema Nacional de Información Territorial. A partir de esta capa, se genero una capa específica para el territorio terrestre de la Isla del Coco. 
+
+```{r eval=FALSE }
+
+wfs_SNIT <- "https://geos.snitcr.go.cr/be/IGN_5/wfs?service=WFS&request=getCapabilities"
+
+cr <- readOGR(wfs_SNIT, layer = "IGN_5:delimitacion2017_5k")%>%
+  st_as_sf()%>%
+ 
+  
+## Generar capa de la Isla del Coco 
+
+bbox_isla <- c(xmin= 156147, ymin= 608238, xmax= 164388, ymax= 616005)
+
+IslaCoco <- st:crop(cr, bbox_isla) ## capa Isla del Coco
+  
+  
+```
+
+## 2. CREACIÓN DEL SISTEMA DE GRILLAS CONTINENTAL islas e islotes cercanos 
+
+### Grillas de 8x8 km
+
+Este proceso inicia con la creación de un polígono de referencia, que se crea en base a las coordenadas de referencia dadas en SINAC (2018). Luego se crea la grilla de 8x8km y se seleccionan las celdas de dicha grilla en base al territorio terrestre continental.  
+
+```{r eval=FALSE }
+
+poligono_base <- as(raster::extent(280000, 660000, 888000, 1244000), "SpatialPolygons") %>%
+  st_as_sf () %>%
+  st_set_crs(st_crs(cr))
+
+grilla_8 <- st_make_grid(poligono_base, cellsize = 8000, crs = 5367, what = "polygons") %>%
+  st_as_sf()%>%
+  rename(geometry=x) %>% 
+  mutate(id=seq.int(nrow(.)))
+
+grilla_8_f <- grilla_8[subset(cr), ] %>%
+  mutate(Cod_8x8 = seq.int(nrow(.))) 
+
+```
+
+### Grillas de 4x4 km
+
+La grilla de 4x4 km, y las de menor tamaño, se crean en base a la grilla de 8x8 km. Además, se utilizan centroides, para los procesos de selección de grillas y unión de capas necesarios para que el sistema de grillas final sea completo. 
+
+Por completo, se entiende que todas las celdas de 8x8 km, tendrán las 4 celdas correspondientes de 4x4km, y así sucesivamente para los tamaños menores. 
+
+
+
+```{r eval=FALSE }
+
+grilla_4 <- st_make_grid(grilla_8, cellsize = 4000, crs = 5367, what = "polygons") %>%  
+  st_as_sf()%>%
+  mutate(id=rownames(.)) %>%
+  rename(geometry=x)
+
+grilla_4_2 <- grilla_4[subset(grilla_8_f), ]  
+
+cent_4 <- st_centroid(grilla_4_2 , of_largest_polygon = TRUE) 
+
+cent4_filtrados <- cent_4[subset(grilla_8_f),]
+
+grilla_4_f <- grilla_4_2 [subset(cent4_filtrados), ] %>% 
+  mutate(ID_4x4 = seq.int(nrow(.))) 
+
+#### nomenclatura
+
+a <- st_join(cent4_filtrados, grilla_8_f) 
+
+aa <- st_join(grilla_4_f, a)
+
+a1 <- nrow (aa)/4     
+b1 <- rep (seq(1:4), a1)    
+
+aa1 <- aa[with(aa, order(Cod_8x8, ID_4x4)), ]
+
+aa1$seq4 <- b1 
+aa1$Cod_4x4 <-paste(aa1$Cod_8x8, aa1$seq4, sep="-") 
+
+grilla_4_final <- aa1[, c(2,8,5,6)]
+
+
+```
+
+
+### Grillas de 2x2 km
+
+Aplican mismos comentarios que para las grillas de 4x4 km.
+
+
+```{r eval=FALSE }
+
+grilla_2 <- st_make_grid(grilla_8, cellsize = 2000, crs = 5367, what = "polygons") %>%
+  st_as_sf()%>%
+  mutate(id=rownames(.)) %>%
+  rename(geometry=x)
+
+grilla_2_2 <- grilla_2[subset(grilla_8_f), ]
+
+cent_2 <- st_centroid(grilla_2_2, of_largest_polygon = TRUE)
+
+cent2_filtrados <- cent_2[subset(grilla_8_f),]
+
+grilla_2_f <- grilla_2_2[subset(cent2_filtrados), ] %>%
+  mutate(ID_2x2 = seq.int(nrow(.)))
+
+### nomenclatura
+
+b <- st_join(cent2_filtrados, grilla_4_final) 
+
+bb <- st_join(grilla_2_f, b) 
+
+a2 <- nrow (grilla_2_f)/4    
+b2 <- rep (seq(1:4), a2)    
+
+bb1 <- bb[with(bb, order(Cod_4x4, ID_2x2)), ] 
+
+bb1$seq2 <- b2 
+bb1$Cod_2x2 <-paste(bb1$Cod_4x4, bb1$seq2, sep="-") 
+
+grilla_2_final <- bb1[, c(2,9,5,6,7)]
+
+
+```
+
+### Grillas de 2x2 km
+
+Aplican mismos comentarios que para las grillas de 4x4 km.
+
+```{r eval=FALSE }
+grilla_1 <- st_make_grid(grilla_8, cellsize = 1000, crs = 5367, what = "polygons") %>%
+  st_as_sf()%>%
+  mutate(id=rownames(.)) %>%
+  rename(geometry=x)
+
+grilla_1_1 <- grilla_1[subset(grilla_8_f), ]
+
+cent_1 <- st_centroid(grilla_1_1, of_largest_polygon = TRUE)
+
+cent1_filtrados <- cent_1[subset(grilla_8_f),]
+
+grilla_1_f <- grilla_1_1[subset(cent1_filtrados), ] %>%
+  mutate(ID_1x1 = seq.int(nrow(.)))
+
+## nomenclatura
+
+c <- st_join(cent1_filtrados, grilla_2_final) 
+
+cc <- st_join(grilla_1_f, c) 
+
+a3 <- nrow (grilla_1_f)/4    
+b3 <- rep (seq(1:4), a3)   
+
+cc1 <- cc[with(cc, order(Cod_2x2, ID_1x1)), ] 
+
+cc1$seq1 <- b3 
+cc1$Cod_1x1 <-paste(cc1$Cod_2x2, cc1$seq1, sep="-") 
+
+grilla_1_final <- cc1[, c(2,10,5,6,7,8)]
+
+
+```
+
+## 3. CREACIÓN SISTEMA DE GRILLAS ISLA DEL COCO
+
+Para el territorio terrestre de la Isla del Coco se genearon dos grillas, de 2x2km y 1x1 km, aplicando los mismos procesos que para los sistemas de grillas continentales.
+
+### Grilla de 2x2 km
+
+
+
+```{r eval=FALSE }
+grilla_2_isla <- st_make_grid(pIsla, cellsize = 2000, crs =  5367, what = "polygons") %>%
+  st_as_sf()%>%
+  rename(geometry=x) %>% 
+  mutate(id=seq.int(nrow(.)))
+
+grilla_2_isla_f <- grilla_2_isla[subset(IslaCoco), ] %>%
+  mutate(Cod_2x2 = seq.int(nrow(.))) %>%
+  st_as_sf ()
+ 
+```
+
+
+### Grilla de 1x1 km
+
+```{r eval=FALSE }
+grilla_1_isla <- st_make_grid(grilla_2_isla, cellsize = 1000, crs =  5367, what = "polygons") %>%
+  st_as_sf()%>%
+  rename(geometry=x) %>% 
+  mutate(id=seq.int(nrow(.)))
+
+grilla_1_1_isla <- grilla_1_isla[subset(grilla_2_isla_f), ]
+
+cent_1isla <- st_centroid(grilla_1_1_isla, of_largest_polygon = TRUE) 
+
+cent1Isla_filtrados <- cent_1isla[subset(grilla_2_isla_f),]
+
+grilla_1_isla_f <- grilla_1_1_isla[subset(cent1Isla_filtrados), ] %>% 
+  mutate(ID_1x1 = seq.int(nrow(.))) 
+
+## nomenclatura
+
+c_isla <- st_join(cent1Isla_filtrados, grilla_2_isla_f)
+
+cc_isla <- st_join(grilla_1_isla_f, c_isla) 
+
+a3_isla <- nrow (grilla_1_isla_f)/4    
+b3_isla <- rep (seq(1:4), a3_isla)    
+
+cc1_isla <- cc_isla[with(cc_isla, order(Cod_2x2, id.x)), ] 
+
+cc1_isla$seq1 <- b3_isla 
+cc1_isla$Cod_1x1 <-paste(cc1_isla$Cod_2x2, cc1_isla$seq1, sep="-")
+
+grilla_1_isla_final <- cc1_isla[, c(2,8,5,6)]
+
+```
+
+
